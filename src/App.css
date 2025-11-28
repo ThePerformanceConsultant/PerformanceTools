@@ -1,0 +1,88 @@
+
+.calculator-app {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+  color: #1a1a2e;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  min-height: 100vh;
+}
+
+.app-header {
+  text-align: center;
+  margin-bottom: 30px;
+  padding: 30px 20px;
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  border-radius: 16px;
+  color: white;
+  box-shadow: 0 4px 20px rgba(26, 26, 46, 0.3);
+}
+
+.app-header h1 {
+  margin: 0 0 10px 0;
+  font-size: clamp(1.5rem, 4vw, 2.2rem);
+  font-weight: 700;
+  letter-spacing: -0.5px;
+}
+
+.subtitle {
+  margin: 0;
+  font-size: 1rem;
+  opacity: 0.9;
+  color: #e94560;
+  font-weight: 500;
+}
+
+.app-main {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+
+.results-container {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+  animation: fadeIn 0.5s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.app-footer {
+  margin-top: 40px;
+  padding: 20px;
+  background: #fff;
+  border-radius: 12px;
+  border-left: 4px solid #e94560;
+}
+
+.disclaimer {
+  margin: 0;
+  font-size: 0.85rem;
+  color: #666;
+  line-height: 1.6;
+}
+
+.disclaimer strong {
+  color: #e94560;
+}
+
+@media (max-width: 768px) {
+  .calculator-app {
+    padding: 15px;
+  }
+  
+  .app-header {
+    padding: 20px 15px;
+  }
+}
