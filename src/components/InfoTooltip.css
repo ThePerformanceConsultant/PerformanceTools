@@ -1,4 +1,3 @@
-
 .info-tooltip-container {
   position: relative;
   display: inline-flex;
@@ -20,6 +19,7 @@
   opacity: 1;
 }
 
+/* Tooltip content - works on all screen sizes */
 .info-tooltip-content {
   position: absolute;
   bottom: calc(100% + 10px);
@@ -32,7 +32,7 @@
   font-size: 0.85rem;
   line-height: 1.5;
   width: 280px;
-  max-width: 90vw;
+  max-width: 85vw;
   z-index: 1000;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
   animation: tooltipFade 0.2s ease;
@@ -48,6 +48,11 @@
   border-top-color: #1a1a2e;
 }
 
+.info-tooltip-body {
+  max-height: 50vh;
+  overflow-y: auto;
+}
+
 .info-tooltip-content strong {
   color: #e94560;
 }
@@ -55,6 +60,11 @@
 .info-tooltip-content em {
   color: #90caf9;
   font-style: normal;
+}
+
+/* Close button - hidden on desktop */
+.info-tooltip-close {
+  display: none;
 }
 
 @keyframes tooltipFade {
@@ -68,16 +78,76 @@
   }
 }
 
+/* Mobile styles */
 @media (max-width: 768px) {
   .info-tooltip-content {
-    left: auto;
-    right: -10px;
-    transform: none;
+    position: absolute;
+    bottom: calc(100% + 10px);
+    left: 50%;
+    right: auto;
+    transform: translateX(-50%);
+    width: 280px;
+    max-width: 80vw;
+    padding: 15px;
+    padding-top: 35px;
+    border-radius: 12px;
+    animation: tooltipFadeMobile 0.2s ease;
+  }
+  
+  /* Keep the arrow on mobile */
+  .info-tooltip-content::after {
+    display: block;
+  }
+  
+  .info-tooltip-body {
+    max-height: 40vh;
+    overflow-y: auto;
+  }
+  
+  .info-tooltip-close {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: 24px;
+    height: 24px;
+    background: rgba(255, 255, 255, 0.15);
+    border: none;
+    border-radius: 50%;
+    color: white;
+    font-size: 12px;
+    cursor: pointer;
+    transition: background 0.2s ease;
+  }
+  
+  .info-tooltip-close:hover,
+  .info-tooltip-close:active {
+    background: rgba(255, 255, 255, 0.25);
+  }
+  
+  @keyframes tooltipFadeMobile {
+    from {
+      opacity: 0;
+      transform: translateX(-50%) translateY(5px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+  }
+}
+
+/* Handle edge cases where tooltip might go off-screen to the left */
+@media (max-width: 400px) {
+  .info-tooltip-content {
+    left: 0;
+    transform: translateX(-10%);
   }
   
   .info-tooltip-content::after {
-    left: auto;
-    right: 15px;
-    transform: none;
+    left: 20%;
+    transform: translateX(0);
   }
 }
