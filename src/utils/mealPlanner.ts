@@ -1,9 +1,8 @@
-
 import { MacroResults, RefuellingPhase } from './calculations';
 
 interface FoodItem {
   name: string;
-  category: 'protein' | 'carb' | 'vegetable';
+  category: 'protein' | 'carb' | 'fat' | 'vegetable';
   per100g: {
     calories: number;
     protein: number;
@@ -14,7 +13,7 @@ interface FoodItem {
 }
 
 const foodDatabase: FoodItem[] = [
-  // Proteins
+  // Lean Proteins (low fat)
   { name: 'Chicken Breast (grilled)', category: 'protein', per100g: { calories: 165, protein: 31, carbs: 0, fat: 3.6, fiber: 0 } },
   { name: 'Egg Whites (cooked)', category: 'protein', per100g: { calories: 52, protein: 11, carbs: 0.7, fat: 0.2, fiber: 0 } },
   { name: 'Greek Yogurt (0% fat)', category: 'protein', per100g: { calories: 59, protein: 10, carbs: 3.6, fat: 0.7, fiber: 0 } },
@@ -23,18 +22,24 @@ const foodDatabase: FoodItem[] = [
   { name: 'Cottage Cheese (1% fat)', category: 'protein', per100g: { calories: 72, protein: 12, carbs: 2.7, fat: 1, fiber: 0 } },
   { name: 'Turkey Breast (roasted)', category: 'protein', per100g: { calories: 135, protein: 30, carbs: 0, fat: 1, fiber: 0 } },
   { name: 'Shrimp (cooked)', category: 'protein', per100g: { calories: 99, protein: 24, carbs: 0.2, fat: 0.3, fiber: 0 } },
-  { name: 'Salmon (baked)', category: 'protein', per100g: { calories: 208, protein: 20, carbs: 0, fat: 13, fiber: 0 } },
-  { name: 'Whole Eggs (scrambled)', category: 'protein', per100g: { calories: 149, protein: 10, carbs: 1.6, fat: 11, fiber: 0 } },
   
-  // Carbs
+  // Carbs (low fat, low protein)
   { name: 'White Rice (cooked)', category: 'carb', per100g: { calories: 130, protein: 2.7, carbs: 28, fat: 0.3, fiber: 0.4 } },
-  { name: 'Oats (dry weight)', category: 'carb', per100g: { calories: 389, protein: 17, carbs: 66, fat: 7, fiber: 10 } },
   { name: 'Sweet Potato (baked)', category: 'carb', per100g: { calories: 86, protein: 1.6, carbs: 20, fat: 0.1, fiber: 3 } },
+  { name: 'Oats (dry weight)', category: 'carb', per100g: { calories: 389, protein: 17, carbs: 66, fat: 7, fiber: 10 } },
+  { name: 'Potato (boiled)', category: 'carb', per100g: { calories: 87, protein: 1.9, carbs: 20, fat: 0.1, fiber: 1.8 } },
+  { name: 'Quinoa (cooked)', category: 'carb', per100g: { calories: 120, protein: 4.4, carbs: 21, fat: 1.9, fiber: 2.8 } },
   { name: 'Banana', category: 'carb', per100g: { calories: 89, protein: 1.1, carbs: 23, fat: 0.3, fiber: 2.6 } },
   { name: 'Whole Wheat Bread', category: 'carb', per100g: { calories: 247, protein: 13, carbs: 41, fat: 3.4, fiber: 7 } },
-  { name: 'Quinoa (cooked)', category: 'carb', per100g: { calories: 120, protein: 4.4, carbs: 21, fat: 1.9, fiber: 2.8 } },
-  { name: 'Potato (boiled)', category: 'carb', per100g: { calories: 87, protein: 1.9, carbs: 20, fat: 0.1, fiber: 1.8 } },
   { name: 'Cream of Rice (cooked)', category: 'carb', per100g: { calories: 52, protein: 1, carbs: 11, fat: 0.2, fiber: 0.2 } },
+  
+  // Fat Sources
+  { name: 'Olive Oil', category: 'fat', per100g: { calories: 884, protein: 0, carbs: 0, fat: 100, fiber: 0 } },
+  { name: 'Almonds', category: 'fat', per100g: { calories: 579, protein: 21, carbs: 22, fat: 50, fiber: 12 } },
+  { name: 'Avocado', category: 'fat', per100g: { calories: 160, protein: 2, carbs: 9, fat: 15, fiber: 7 } },
+  { name: 'Salmon (baked)', category: 'fat', per100g: { calories: 208, protein: 20, carbs: 0, fat: 13, fiber: 0 } },
+  { name: 'Whole Eggs (scrambled)', category: 'fat', per100g: { calories: 149, protein: 10, carbs: 1.6, fat: 11, fiber: 0 } },
+  { name: 'Peanut Butter', category: 'fat', per100g: { calories: 588, protein: 25, carbs: 20, fat: 50, fiber: 6 } },
   
   // Vegetables
   { name: 'Broccoli (steamed)', category: 'vegetable', per100g: { calories: 35, protein: 2.4, carbs: 7, fat: 0.4, fiber: 3.3 } },
@@ -45,11 +50,6 @@ const foodDatabase: FoodItem[] = [
   { name: 'Zucchini (cooked)', category: 'vegetable', per100g: { calories: 17, protein: 1.2, carbs: 3, fat: 0.3, fiber: 1 } },
   { name: 'Green Beans (cooked)', category: 'vegetable', per100g: { calories: 35, protein: 1.9, carbs: 8, fat: 0.3, fiber: 3.4 } },
   { name: 'Cucumber (raw)', category: 'vegetable', per100g: { calories: 15, protein: 0.7, carbs: 3.6, fat: 0.1, fiber: 0.5 } },
-  
-  // Fats (for refuelling phase)
-  { name: 'Avocado', category: 'vegetable', per100g: { calories: 160, protein: 2, carbs: 9, fat: 15, fiber: 7 } },
-  { name: 'Almonds', category: 'vegetable', per100g: { calories: 579, protein: 21, carbs: 22, fat: 50, fiber: 12 } },
-  { name: 'Olive Oil (1 tbsp = 14g)', category: 'vegetable', per100g: { calories: 884, protein: 0, carbs: 0, fat: 100, fiber: 0 } },
 ];
 
 export interface FoodPortion {
@@ -133,58 +133,129 @@ export function formatTime(time: string): string {
   return `${hour12}:${String(m).padStart(2, '0')} ${period}`;
 }
 
+// Lean protein sources for fat loss phase
+const leanProteinSources = [
+  'Chicken Breast (grilled)',
+  'Egg Whites (cooked)',
+  'White Fish (tilapia)',
+  'Lean Beef (95% lean)',
+  'Greek Yogurt (0% fat)',
+  'Cottage Cheese (1% fat)',
+  'Turkey Breast (roasted)',
+  'Shrimp (cooked)',
+];
+
+// Lean protein sources for refuelling (still lean - fats added separately)
+const refuellingProteinSources = [
+  'Chicken Breast (grilled)',
+  'Lean Beef (95% lean)',
+  'Turkey Breast (roasted)',
+  'White Fish (tilapia)',
+  'Greek Yogurt (0% fat)',
+  'Shrimp (cooked)',
+];
+
+// Low-protein carb sources (to minimize extra protein)
+const carbSources = [
+  'White Rice (cooked)',
+  'Sweet Potato (baked)',
+  'Potato (boiled)',
+  'Cream of Rice (cooked)',
+  'Banana',
+];
+
+// Higher protein carb sources (for variety, use sparingly)
+const highProteinCarbSources = [
+  'Oats (dry weight)',
+  'Quinoa (cooked)',
+];
+
+// Fat sources for refuelling
+const fatSources = [
+  'Olive Oil',
+  'Avocado',
+  'Almonds',
+  'Salmon (baked)',
+  'Whole Eggs (scrambled)',
+  'Peanut Butter',
+];
+
+const vegSources = [
+  'Broccoli (steamed)',
+  'Asparagus (cooked)',
+  'Green Beans (cooked)',
+  'Bell Peppers (raw)',
+  'Spinach (raw)',
+  'Zucchini (cooked)',
+];
+
 function buildMealFromTarget(target: MealTarget, mealIndex: number, isRefuelling: boolean = false): Meal {
   const foods: FoodPortion[] = [];
-  let remainingProtein = target.protein;
-  let remainingCarbs = target.carbs;
-  let remainingFats = target.fats;
   
-  // Protein sources rotation
-  const proteinSources = isRefuelling 
-    ? ['Chicken Breast (grilled)', 'Salmon (baked)', 'Lean Beef (95% lean)', 'Whole Eggs (scrambled)']
-    : ['Chicken Breast (grilled)', 'Egg Whites (cooked)', 'White Fish (tilapia)', 'Lean Beef (95% lean)', 'Greek Yogurt (0% fat)', 'Cottage Cheese (1% fat)'];
+  // Track cumulative macros
+  let usedProtein = 0;
+  let usedCarbs = 0;
+  let usedFats = 0;
   
-  const carbSources = ['White Rice (cooked)', 'Sweet Potato (baked)', 'Oats (dry weight)', 'Potato (boiled)', 'Quinoa (cooked)', 'Banana'];
-  const vegSources = ['Broccoli (steamed)', 'Asparagus (cooked)', 'Green Beans (cooked)', 'Bell Peppers (raw)', 'Spinach (raw)', 'Mixed Berries'];
-  
-  // Select protein source based on meal
-  const proteinSourceName = proteinSources[mealIndex % proteinSources.length];
+  // Step 1: Add protein source (always use lean sources)
+  const proteinSourceList = isRefuelling ? refuellingProteinSources : leanProteinSources;
+  const proteinSourceName = proteinSourceList[mealIndex % proteinSourceList.length];
   const proteinFood = getFood(proteinSourceName)!;
-  const proteinGrams = Math.round((remainingProtein / proteinFood.per100g.protein) * 100);
-  const proteinPortion = calculatePortion(proteinFood, Math.min(proteinGrams, 300));
+  
+  // Calculate protein amount needed
+  const targetProteinFromSource = target.protein * 0.9; // Aim for 90% from primary source
+  const proteinGrams = Math.min(250, Math.max(50, Math.round((targetProteinFromSource / proteinFood.per100g.protein) * 100)));
+  const proteinPortion = calculatePortion(proteinFood, proteinGrams);
   foods.push(proteinPortion);
   
-  remainingProtein -= proteinPortion.protein;
-  remainingCarbs -= proteinPortion.carbs;
-  remainingFats -= proteinPortion.fat;
+  usedProtein += proteinPortion.protein;
+  usedCarbs += proteinPortion.carbs;
+  usedFats += proteinPortion.fat;
   
-  // Select carb source
-  if (remainingCarbs > 5) {
+  // Step 2: Add carb source
+  const remainingCarbs = Math.max(0, target.carbs - usedCarbs);
+  if (remainingCarbs > 10) {
+    // Use low-protein carb sources primarily
     const carbSourceName = carbSources[mealIndex % carbSources.length];
     const carbFood = getFood(carbSourceName)!;
-    const carbGrams = Math.round((remainingCarbs / carbFood.per100g.carbs) * 100);
-    const carbPortion = calculatePortion(carbFood, Math.max(0, Math.min(carbGrams, 350)));
-    if (carbPortion.amount > 0) {
-      foods.push(carbPortion);
-      remainingCarbs -= carbPortion.carbs;
-      remainingFats -= carbPortion.fat;
-    }
+    
+    const carbGrams = Math.min(400, Math.max(30, Math.round((remainingCarbs / carbFood.per100g.carbs) * 100)));
+    const carbPortion = calculatePortion(carbFood, carbGrams);
+    foods.push(carbPortion);
+    
+    usedProtein += carbPortion.protein;
+    usedCarbs += carbPortion.carbs;
+    usedFats += carbPortion.fat;
   }
   
-  // Add fat source for refuelling phase if needed
-  if (isRefuelling && remainingFats > 5) {
-    const fatSources = ['Avocado', 'Almonds', 'Olive Oil (1 tbsp = 14g)'];
+  // Step 3: Add fat source (for refuelling phase, or if fats are significantly under)
+  const remainingFats = Math.max(0, target.fats - usedFats);
+  if (isRefuelling && remainingFats > 3) {
+    // Choose fat source based on meal index for variety
     const fatSourceName = fatSources[mealIndex % fatSources.length];
     const fatFood = getFood(fatSourceName)!;
-    const fatGrams = Math.round((remainingFats / fatFood.per100g.fat) * 100);
-    const fatPortion = calculatePortion(fatFood, Math.max(0, Math.min(fatGrams, 100)));
-    if (fatPortion.amount > 0) {
+    
+    // For pure fats like olive oil, use smaller amounts
+    let maxFatGrams = 60;
+    if (fatSourceName === 'Olive Oil') {
+      maxFatGrams = 20; // ~1.5 tbsp max
+    } else if (fatSourceName === 'Almonds' || fatSourceName === 'Peanut Butter') {
+      maxFatGrams = 40;
+    }
+    
+    // Account for protein in fat sources
+    const fatGrams = Math.min(maxFatGrams, Math.max(0, Math.round((remainingFats / fatFood.per100g.fat) * 100)));
+    if (fatGrams >= 5) {
+      const fatPortion = calculatePortion(fatFood, fatGrams);
       foods.push(fatPortion);
-      remainingFats -= fatPortion.fat;
+      
+      usedProtein += fatPortion.protein;
+      usedCarbs += fatPortion.carbs;
+      usedFats += fatPortion.fat;
     }
   }
   
-  // Add vegetables
+  // Step 4: Add vegetables (minimal macro impact, good for fiber/volume)
   const vegSourceName = vegSources[mealIndex % vegSources.length];
   const vegFood = getFood(vegSourceName)!;
   const vegPortion = calculatePortion(vegFood, 100);
@@ -336,6 +407,7 @@ export function generateRefuellingMealPlan(
   
   const mealTargets: MealTarget[] = [];
   
+  // More even distribution for refuelling
   const proteinPerMeal = targetProtein / 4;
   const carbsAroundTraining = targetCarbs * 0.55;
   const carbsOtherMeals = targetCarbs * 0.45;
@@ -350,7 +422,7 @@ export function generateRefuellingMealPlan(
     mealTargets.push({
       protein: proteinPerMeal * 0.8,
       carbs: carbsAroundTraining * 0.3,
-      fats: fatsPerMeal * 0.5,
+      fats: fatsPerMeal * 0.7,
       name: 'Light Pre-Training',
       type: 'Pre-Training',
       time: formatTime(preTrainingTime),
@@ -360,7 +432,7 @@ export function generateRefuellingMealPlan(
     mealTargets.push({
       protein: proteinPerMeal * 1.2,
       carbs: carbsAroundTraining * 0.7,
-      fats: fatsPerMeal * 0.5,
+      fats: fatsPerMeal * 0.8,
       name: 'Post-Training Breakfast',
       type: 'Post-Training',
       time: formatTime(postTrainingTime),
@@ -370,7 +442,7 @@ export function generateRefuellingMealPlan(
     mealTargets.push({
       protein: proteinPerMeal,
       carbs: carbsOtherMeals * 0.5,
-      fats: fatsPerMeal * 1.5,
+      fats: fatsPerMeal * 1.25,
       name: 'Lunch',
       type: 'Lunch',
       time: formatTime(lunchTime),
@@ -379,7 +451,7 @@ export function generateRefuellingMealPlan(
     mealTargets.push({
       protein: proteinPerMeal,
       carbs: carbsOtherMeals * 0.5,
-      fats: fatsPerMeal * 1.5,
+      fats: fatsPerMeal * 1.25,
       name: 'Dinner',
       type: 'Dinner',
       time: formatTime(dinnerTime),
@@ -429,5 +501,6 @@ export function generateRefuellingMealPlan(
     });
   }
   
-  return mealTargets.map((target, index) => buildMealFromTarget(target, index + 4, true));
+  // Use mealIndex offset of 10 for refuelling to get different food variety
+  return mealTargets.map((target, index) => buildMealFromTarget(target, index + 10, true));
 }
