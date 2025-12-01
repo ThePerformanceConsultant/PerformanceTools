@@ -9,13 +9,14 @@ function InfoTooltip({ children }: InfoTooltipProps) {
   const [isVisible, setIsVisible] = useState(false);
   const tooltipRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
-  const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
-        containerRef.current &&
-        !containerRef.current.contains(event.target as Node)
+        tooltipRef.current &&
+        !tooltipRef.current.contains(event.target as Node) &&
+        buttonRef.current &&
+        !buttonRef.current.contains(event.target as Node)
       ) {
         setIsVisible(false);
       }
@@ -23,20 +24,13 @@ function InfoTooltip({ children }: InfoTooltipProps) {
 
     if (isVisible) {
       document.addEventListener('mousedown', handleClickOutside);
-      
-      // Scroll tooltip into view on mobile
-      if (tooltipRef.current && window.innerWidth <= 768) {
-        setTimeout(() => {
-          tooltipRef.current?.scrollIntoView({ 
-            behavior: 'smooth', 
-            block: 'center' 
-          });
-        }, 50);
-      }
+      // Prevent body scroll on mobile when modal is open
+      document.body.style.overflow = 'hidden';
     }
     
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
+      document.body.style.overflow = '';
     };
   }, [isVisible]);
 
@@ -45,7 +39,7 @@ function InfoTooltip({ children }: InfoTooltipProps) {
   };
 
   return (
-    <div className="info-tooltip-container" ref={containerRef}>
+    <div className="info-tooltip-container">
       <button
         ref={buttonRef}
         type="button"
@@ -56,22 +50,22 @@ function InfoTooltip({ children }: InfoTooltipProps) {
         ℹ️
       </button>
       {isVisible && (
-        <div ref={tooltipRef} className="info-tooltip-content">
-          <button 
-            className="info-tooltip-close"
-            onClick={() => setIsVisible(false)}
-            aria-label="Close"
-            type="button"
-          >
-            ✕
-          </button>
-          <div className="info-tooltip-body">
+        <>
+          <div className="info-tooltip-overlay" onClick={() => setIsVisible(false)} />
+          <div ref={tooltipRef} className="info-tooltip-content">
+            <button 
+              className="info-tooltip-close"
+              onClick={() => setIsVisible(false)}
+              aria-label="Close"
+              type="button"
+            >
+              ✕
+            </button>
             {children}
           </div>
-        </div>
+        </>
       )}
     </div>
   );
 }
-
 export default InfoTooltip;
