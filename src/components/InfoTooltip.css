@@ -19,7 +19,12 @@
   opacity: 1;
 }
 
-/* Tooltip content - works on all screen sizes */
+/* Overlay - hidden on desktop, visible on mobile */
+.info-tooltip-overlay {
+  display: none;
+}
+
+/* Desktop tooltip styles */
 .info-tooltip-content {
   position: absolute;
   bottom: calc(100% + 10px);
@@ -32,7 +37,7 @@
   font-size: 0.85rem;
   line-height: 1.5;
   width: 280px;
-  max-width: 85vw;
+  max-width: 90vw;
   z-index: 1000;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
   animation: tooltipFade 0.2s ease;
@@ -46,11 +51,6 @@
   transform: translateX(-50%);
   border: 8px solid transparent;
   border-top-color: #1a1a2e;
-}
-
-.info-tooltip-body {
-  max-height: 50vh;
-  overflow-y: auto;
 }
 
 .info-tooltip-content strong {
@@ -78,30 +78,40 @@
   }
 }
 
-/* Mobile styles */
+/* Mobile styles - bottom sheet modal */
 @media (max-width: 768px) {
-  .info-tooltip-content {
-    position: absolute;
-    bottom: calc(100% + 10px);
-    left: 50%;
-    right: auto;
-    transform: translateX(-50%);
-    width: 280px;
-    max-width: 80vw;
-    padding: 15px;
-    padding-top: 35px;
-    border-radius: 12px;
-    animation: tooltipFadeMobile 0.2s ease;
-  }
-  
-  /* Keep the arrow on mobile */
-  .info-tooltip-content::after {
+  .info-tooltip-overlay {
     display: block;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 9998;
+    animation: overlayFade 0.2s ease;
   }
   
-  .info-tooltip-body {
-    max-height: 40vh;
+  .info-tooltip-content {
+    position: fixed;
+    bottom: 20px;
+    left: 16px;
+    right: 16px;
+    top: auto;
+    transform: none;
+    width: auto;
+    max-width: none;
+    z-index: 9999;
+    padding: 20px;
+    padding-top: 45px;
+    border-radius: 16px;
+    animation: slideUp 0.3s ease;
+    max-height: 70vh;
     overflow-y: auto;
+  }
+  
+  .info-tooltip-content::after {
+    display: none;
   }
   
   .info-tooltip-close {
@@ -109,15 +119,15 @@
     align-items: center;
     justify-content: center;
     position: absolute;
-    top: 8px;
-    right: 8px;
-    width: 24px;
-    height: 24px;
+    top: 12px;
+    right: 12px;
+    width: 28px;
+    height: 28px;
     background: rgba(255, 255, 255, 0.15);
     border: none;
     border-radius: 50%;
     color: white;
-    font-size: 12px;
+    font-size: 14px;
     cursor: pointer;
     transition: background 0.2s ease;
   }
@@ -127,27 +137,19 @@
     background: rgba(255, 255, 255, 0.25);
   }
   
-  @keyframes tooltipFadeMobile {
+  @keyframes overlayFade {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  
+  @keyframes slideUp {
     from {
       opacity: 0;
-      transform: translateX(-50%) translateY(5px);
+      transform: translateY(30px);
     }
     to {
       opacity: 1;
-      transform: translateX(-50%) translateY(0);
+      transform: translateY(0);
     }
-  }
-}
-
-/* Handle edge cases where tooltip might go off-screen to the left */
-@media (max-width: 400px) {
-  .info-tooltip-content {
-    left: 0;
-    transform: translateX(-10%);
-  }
-  
-  .info-tooltip-content::after {
-    left: 20%;
-    transform: translateX(0);
   }
 }
