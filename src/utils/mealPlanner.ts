@@ -164,10 +164,13 @@ const carbSources = [
   'Banana',
 ];
 
-// Higher protein carb sources (for variety, use sparingly)
-const highProteinCarbSources = [
-  'Oats (dry weight)',
-  'Quinoa (cooked)',
+// Secondary carb sources for high-carb meals
+const secondaryCarbSources = [
+  'Banana',
+  'White Rice (cooked)',
+  'Potato (boiled)',
+  'Sweet Potato (baked)',
+  'Cream of Rice (cooked)',
 ];
 
 // Fat sources for refuelling
@@ -212,20 +215,44 @@ function buildMealFromTarget(target: MealTarget, mealIndex: number, isRefuelling
   usedCarbs += proteinPortion.carbs;
   usedFats += proteinPortion.fat;
   
-  // Step 2: Add carb source
-  const remainingCarbs = Math.max(0, target.carbs - usedCarbs);
+  // Step 2: Add carb source(s) - may need multiple for high carb targets
+  let remainingCarbs = Math.max(0, target.carbs - usedCarbs);
   if (remainingCarbs > 10) {
-    // Use low-protein carb sources primarily
     const carbSourceName = carbSources[mealIndex % carbSources.length];
     const carbFood = getFood(carbSourceName)!;
     
-    const carbGrams = Math.min(400, Math.max(30, Math.round((remainingCarbs / carbFood.per100g.carbs) * 100)));
+    // Dynamic max portion based on carb target - allow larger portions for high-carb meals
+    const maxCarbPortion = target.carbs > 100 ? 550 : 400;
+    
+    const idealGrams = Math.round((remainingCarbs / carbFood.per100g.carbs) * 100);
+    const carbGrams = Math.min(maxCarbPortion, Math.max(30, idealGrams));
     const carbPortion = calculatePortion(carbFood, carbGrams);
     foods.push(carbPortion);
     
     usedProtein += carbPortion.protein;
     usedCarbs += carbPortion.carbs;
     usedFats += carbPortion.fat;
+    
+    // If we still need significant carbs (hit the cap), add a second carb source
+    remainingCarbs = Math.max(0, target.carbs - usedCarbs);
+    if (remainingCarbs > 15 && idealGrams > maxCarbPortion) {
+      // Use a different carb source (offset by 2 to get variety)
+      const secondCarbIdx = (mealIndex + 2) % secondaryCarbSources.length;
+      const secondCarbSourceName = secondaryCarbSources[secondCarbIdx];
+      const secondCarbFood = getFood(secondCarbSourceName)!;
+      
+      const secondIdealGrams = Math.round((remainingCarbs / secondCarbFood.per100g.carbs) * 100);
+      const secondCarbGrams = Math.min(250, Math.max(30, secondIdealGrams));
+      
+      if (secondCarbGrams >= 30) {
+        const secondCarbPortion = calculatePortion(secondCarbFood, secondCarbGrams);
+        foods.push(secondCarbPortion);
+        
+        usedProtein += secondCarbPortion.protein;
+        usedCarbs += secondCarbPortion.carbs;
+        usedFats += secondCarbPortion.fat;
+      }
+    }
   }
   
   // Step 3: Add fat source (for refuelling phase, or if fats are significantly under)
@@ -501,6 +528,7 @@ export function generateRefuellingMealPlan(
     });
   }
   
-  // Use mealIndex offset of 10 for refuelling to get different food variety
-  return mealTargets.map((target, index) => buildMealFromTarget(target, index + 10, true));
+  // Use different mealIndex offset for week 2 to get different food variety
+  const indexOffset = week === 1 ? 10 : 16;
+  return mealTargets.map((target, index) => buildMealFromTarget(target, index + indexOffset, true));
 }
